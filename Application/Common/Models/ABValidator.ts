@@ -33,11 +33,23 @@ export default class ABValidator {
 
     }
 
-    async Must(callback: (property: any) => boolean): Promise<this> {
+    async MustAsync(callback: (property: any) => (Promise<boolean> | boolean), msg: string = ''): Promise<this> {
 
         let res: boolean = await callback(this.Property);
         if(!res){
             this.Result = false;
+            if(msg != ''){this.Message.push(`${this.Message} ${msg} `);}
+        }
+        return this;
+
+    }
+
+    Must(callback: (property: any) => boolean, msg: string = ''): this {
+
+        let res: boolean = callback(this.Property);
+        if(!res){
+            this.Result = false;
+            if(msg != ''){this.Message.push(`${this.Message} ${msg} `);}
         }
         return this;
 
@@ -59,6 +71,11 @@ export default class ABValidator {
     }
 
     validEmail(): this {
+        return this;
+    }
+
+    setMessage(msg: string): this {
+        this.Message.push(`${this.Message} ${msg} `);
         return this;
     }
 

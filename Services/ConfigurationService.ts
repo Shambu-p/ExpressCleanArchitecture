@@ -26,6 +26,19 @@ class ConfigurationService {
 
     }
 
+    setConfiguration(confName: string, value: any): void {
+        
+        let configurations = JSON.parse(fs.readFileSync( this.FileAddress , { encoding: 'utf8' }));
+        if(configurations[confName] == null){
+            throw new Error(`Configuration named ${confName} is not found in configuration file`);
+        }
+
+        configurations[confName] = value;
+
+        fs.writeFileSync(this.FileAddress, JSON.stringify(configurations), { encoding: 'utf8' });
+
+    }
+
 }
 
 export default ConfigurationService;

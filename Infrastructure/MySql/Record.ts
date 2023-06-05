@@ -23,10 +23,6 @@ export default class Records<T> implements RecordsInterface<T> {
         return new Records<T>(this.Data.filter(callback));
     }
 
-    Find(callback: (single: T) => boolean): (T|null) {
-        return this.Data.find(callback) ?? null;
-    }
-
     Select<R>(callback: (single: T) => R): Records<R> {
         return new Records<R>(this.Data.map<R>(callback));
     }

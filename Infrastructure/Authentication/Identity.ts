@@ -34,16 +34,16 @@ export default class Identity {
         return new DBTable<R>(this.DbConnection, this.TableName, this.IdentifierName);
     }
 
-    private async dataCleaner(obj: any): Promise<any>{
+    private dataCleaner(obj: any): any {
 
         let entries = Object.entries(obj);
 
         //search for all the properties declared as encrypted values
         //and change their value to encrypted value
-        entries.forEach(async ([prop, value]: [string, any]) => {
+        entries.forEach(([prop, value]: [string, any]) => {
             if(this.HashedProperties.indexOf(prop) >= 0){
                 //encrypt the value and set it back
-                obj[prop] = await bcrypt.hash(value, this.SaltRounds);
+                obj[prop] = bcrypt.hashSync(value, this.SaltRounds);
             }
         });
 
@@ -54,16 +54,14 @@ export default class Identity {
     async Update<T>(user: T): Promise<boolean> {
 
         let dbTable = this.getCollection<T>();
-        let cleanedData = this.dataCleaner(new Object(user))
-        return await dbTable.Update(await cleanedData);
+        return await dbTable.Update(this.dataCleaner(new Object(user)));
 
     }
 
     async Create<T>(user: T): Promise<boolean> {
 
         let dbTable = this.getCollection<T>();
-        let cleanedData = this.dataCleaner(new Object(user));
-        return await dbTable.Add(await cleanedData);
+        return await dbTable.Add(this.dataCleaner(new Object(user)));
 
     }
 

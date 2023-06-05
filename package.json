@@ -20,13 +20,15 @@
   "homepage": "https://github.com/Shambu-p/Reatask#readme",
   "dependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/sequelize": "^4.28.15",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
     "express": "^4.18.2",
     "fs": "0.0.1-security",
     "jsonwebtoken": "^9.0.0",
     "mysql2": "^2.3.3",
-    "nodemailer": "^6.8.0"
+    "nodemailer": "^6.8.0",
+    "sequelize": "^6.31.1"
   },
   "devDependencies": {
     "@testdeck/mocha": "^0.3.3",

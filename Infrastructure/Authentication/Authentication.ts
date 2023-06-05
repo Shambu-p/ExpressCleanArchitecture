@@ -1,4 +1,5 @@
 import AuthenticationInterface from "../../Application/Common/Interfaces/AuthenticationInterface";
+import Response from "../../Application/Common/Response";
 import Identity from "./Identity";
 const jwt = require("jsonwebtoken");
 
@@ -17,42 +18,52 @@ export default class Authentication implements AuthenticationInterface {
         this.Identity = identity;
     }
 
-    Authorize<T>(token: string): void {
-        Authentication.User = jwt.verify(token, this.SecretKey);
+    Authorize<T>(token: string): T {
+        return jwt.verify(token, this.SecretKey);
     }
 
-    async Authenticate<T>(loginLogic: (identity: Identity) => Promise<T> ): Promise<{ token: string | null; state: boolean; }> {
+    async Authenticate<T>(loginLogic: (identity: Identity) => Promise<T>): Promise<{ token: string | null; state: boolean; user: T | null; }> {
 
-        let user: any = new Object(await loginLogic(this.Identity));
+        const userObject = await loginLogic(this.Identity);
+        let user: any = new Object(userObject);
 
-        if(!user[this.Identity.IdentifierName] && user[this.Identity.IdentifierName] == null){
+        if (!user[this.Identity.IdentifierName] && user[this.Identity.IdentifierName] == null) {
             throw new Error(`Identifier named ${this.Identity.IdentifierName} was not found or it is null in the object to be authenticated`);
         }
 
-        const token = jwt.sign({ ...user, _id: user[this.Identity.IdentifierName]}, this.SecretKey, {
+        const token = jwt.sign({ ...user, _id: user[this.Identity.IdentifierName] }, this.SecretKey, {
             expiresIn: `${this.Expiration}hr`,
         });
 
         return {
             token: token,
-            state: true
+            state: true,
+            user: userObject
         }
 
     }
 
-    GetUser<T>(token: string): T {
+    GetUser<T>(): T {
         return Authentication.User;
     }
 
+    fromToken<T>(token: string): T {
+        return jwt.verify(token, this.SecretKey);
+    }
+
+    setUser<T>(value: (T | null)) {
+        Authentication.User = value;
+    }
+
     async Authorization<T>(authLogic?: (loggedUser: T) => Promise<boolean>): Promise<void> {
-        if(authLogic){
-            if(!await authLogic(Authentication.User)){
+        if (authLogic) {
+            if (!await authLogic(Authentication.User)) {
                 throw new Error("Authorization failed!");
             }
         }
     }
 
-    getToken(){
+    getToken() {
         return jwt.sign(
             {
                 data: 'foobar'

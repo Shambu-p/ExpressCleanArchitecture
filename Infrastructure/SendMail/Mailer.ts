@@ -11,16 +11,16 @@ export default class Mailer implements IMailer {
     private readonly Transporter: any;
 
     constructor(configuration: any) {
-        
+
         this.Host = configuration.Host;
         this.Port = configuration.Port;
         this.Username = configuration.Username;
         this.Password = configuration.Password;
-        
+
         this.Transporter = nodemailer.createTransport({
             host: configuration.Host,
             port: configuration.Port,
-            secure: false, // true for 465, false for other ports
+            secure: true, // true for 465, false for other ports
             auth: {
                 user: configuration.Username,
                 pass: configuration.Password
@@ -29,9 +29,23 @@ export default class Mailer implements IMailer {
 
     }
 
-    send(from: string, to: string, subject: string, body: string): Promise<Response> {
+    async send(from: string, to: string, subject: string, body: string): Promise<Response> {
         //todo: implement sender logic
-        throw new Error("Method not implemented.");
+
+        let mailDetails = {
+            from: from,
+            to: to,
+            subject: subject,
+            text: body
+        };
+
+        let result = await this.Transporter.sendMail(mailDetails);
+
+        console.log(result);
+
+        return Response.Succeded("sent");
+
+        // throw new Error("Method not implemented.");
     }
 
 }
